@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Procedure Text</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --secondary: #38bdf8;
+            --bg-body: #f0f9ff;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-sidebar: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            --primary: #38bdf8;
+            --primary-hover: #7dd3fc;
+            --secondary: #0284c7;
+            --bg-body: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.85);
+            --bg-sidebar: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .login-header h2 {
+            color: #0f172a;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Layout Structure */
+        #app-container {
+            display: none;
+            flex: 1;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header i {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--primary);
+        }
+
+        /* Main Area */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Header Navigation */
+        header {
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        /* Content Sections */
+        .content-body {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-section {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* UI Cards */
+        .card {
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Custom Accordion */
+        .accordion-item {
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.02);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .accordion-content {
+            padding: 20px;
+            display: none;
+            background: transparent;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .accordion-item.active .accordion-content {
+            display: block;
+        }
+
+        /* Game & Quiz Styling */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            background: var(--bg-sidebar);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(2, 132, 199, 0.05);
+        }
+
+        .option-btn.correct {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
+        }
+
+        .option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+        }
+
+        /* Drag and Drop Game */
+        .drag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            min-height: 60px;
+            padding: 10px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+        }
+
+        .drag-item {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: 500;
+        }
+
+        .drop-zone {
+            padding: 20px;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Scroll to Top */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            z-index: 99;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+            }
+            aside.open {
+                left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .content-body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3" preload="auto"></audio>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h2>Media Pembelajaran</h2>
+                <p>Bahasa Inggris - XI Ganjil</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="studentName"><i class="fa-solid fa-user"></i> Nama Siswa</label>
+                    <input type="text" id="studentName" placeholder="Masukkan nama lengkap" required>
+                </div>
+                <div class="form-group">
+                    <label for="schoolName"><i class="fa-solid fa-school"></i> Sekolah Asal</label>
+                    <input type="text" id="schoolName" placeholder="Masukkan sekolah asal" required>
+                </div>
+                <div class="form-group">
+                    <label for="accessPin"><i class="fa-solid fa-key"></i> PIN Akses</label>
+                    <input type="password" id="accessPin" placeholder="Masukkan PIN" required>
+                </div>
+                <button type="submit" class="btn-primary">Masuk Pembelajaran</button>
+                <div id="loginError" class="error-message">PIN yang Anda masukkan salah!</div>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <h3>ENGLISH XI</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="nav-link active" data-target="home"><i class="fa-solid fa-house"></i> Beranda</a></li>
+                <li><a href="#" class="nav-link" data-target="instructions"><i class="fa-solid fa-circle-info"></i> Petunjuk</a></li>
+                <li><a href="#" class="nav-link" data-target="materials"><i class="fa-solid fa-book-bookmark"></i> Materi</a></li>
+                <li><a href="#" class="nav-link" data-target="game"><i class="fa-solid fa-gamepad"></i> Game Edukasi</a></li>
+                <li><a href="#" class="nav-link" data-target="practice"><i class="fa-solid fa-pen-to-square"></i> Latihan Interaktif</a></li>
+                <li><a href="#" class="nav-link" data-target="evaluation"><i class="fa-solid fa-clipboard-check"></i> Evaluasi</a></li>
+                <li><a href="#" class="nav-link" data-target="summary"><i class="fa-solid fa-file-contract"></i> Ringkasan</a></li>
+                <li><a href="#" class="nav-link" data-target="references"><i class="fa-solid fa-link"></i> Referensi</a></li>
+                <li><a href="#" class="nav-link" data-target="profile"><i class="fa-solid fa-id-card"></i> Profil Penyusun</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            <header>
+                <div class="header-title">
+                    <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
+                    <h4 id="pageTitle">Beranda</h4>
+                </div>
+                <div class="user-profile">
+                    <button class="theme-toggle" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+                    <span id="displayStudentName" style="font-weight: 500;">-</span>
+                </div>
+            </header>
+
+            <div class="content-body">
+
+                <section id="home" class="page-section active">
+                    <div class="card glass">
+                        <h2 id="welcomeGreeting">Selamat Datang!</h2>
+                        <p style="color: var(--text-muted); margin-top: 5px;">Mari belajar membuat dan memahami teks prosedur tentang pengelolaan keuangan pribadi!</p>
+                        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
+                        <h3>Topik: Procedure Text (Personal Money Management)</h3>
+                        <br>
+                        <h4><i class="fa-solid fa-bullseye"></i> Tujuan Pembelajaran:</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                            <li>Siswa dapat mengidentifikasi gagasan utama dan tujuan penulis dalam Procedure Text tentang pengelolaan keuangan pribadi dengan tepat.</li>
+                            <li>Siswa dapat mensintesis dan mengevaluasi informasi inti serta rinci dalam Procedure Text mengenai pengelolaan keuangan secara tepat.</li>
+                        </ul>
+                        <br>
+                        <button class="btn-primary" onclick="navigateTo('materials')" style="width: auto; padding: 12px 25px;"><i class="fa-solid fa-rocket"></i> Mulai Belajar</button>
+                    </div>
+                </section>
+
+                <section id="instructions" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-compass"></i> <h3 class="card-title">Petunjuk Penggunaan Media</h3></div>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li><strong>Navigasi:</strong> Gunakan menu sidebar untuk berpindah antarhalaman (Materi, Game, Latihan, Evaluasi).</li>
+                            <li><strong>Materi:</strong> Pelajari struktur dan kebahasaan Procedure Text pada menu Materi.</li>
+                            <li><strong>Game Edukasi:</strong> Mainkan game urutan langkah pengelolaan keuangan untuk menguji pemahaman awal Anda.</li>
+                            <li><strong>Latihan & Evaluasi:</strong> Jawab latihan 10 soal dan ikuti ujian evaluasi bertimer untuk mendapatkan nilai akhir.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="materials" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-book"></i> <h3 class="card-title">Materi: Procedure Text</h3></div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>1. Definition & Social Function</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <p><strong>Procedure Text</strong> is a text that gives instructions on how to do or make something step-by-step.</p>
+                                <p><strong>Social Function:</strong> To explain/guide the reader on how to achieve a goal (e.g., How to Manage Personal Financial Expenses effectively).</p>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>2. Generic Structure</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li><strong>Goal/Aim:</strong> Outlines the main goal (e.g., <em>How to Create a Monthly Budget</em>).</li>
+                                    <li><strong>Materials/Equipment:</strong> Things needed (e.g., Notebook, Budgeting App, Bank Records).</li>
+                                    <li><strong>Steps/Methods:</strong> Sequential instructions (e.g., First, Next, Then, Finally).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>3. Language Features</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Use Simple Present Tense.</li>
+                                    <li>Use Imperative Sentences (e.g., <em>Calculate your income, Save 20% of money</em>).</li>
+                                    <li>Use Action Verbs (e.g., <em>track, set, divide, pay</em>).</li>
+                                    <li>Use Temporal Connectives (e.g., <em>First, Second, After that, Finally</em>).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="game" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-gamepad"></i> <h3 class="card-title">Game Edukasi: Susun Urutan (Smart Budgeting Steps)</h3></div>
+                        <p>Tarik (Drag) atau Pilih urutan langkah-langkah pengelolaan uang yang benar di bawah ini!</p>
+                        
+                        <div class="progress-bar-container"><div class="progress-bar-fill" id="gameProgress"></div></div>
+
+                        <div class="drag-container" id="dragSource">
+                            </div>
+
+                        <h4>Urutan Target:</h4>
+                        <div id="dropTarget" class="drop-zone" style="flex-direction: column; align-items: stretch;">
+                            </div>
+
+                        <button class="btn-primary" onclick="checkGameOrder()" style="width: auto;"><i class="fa-solid fa-check"></i> Periksa Hasil</button>
+                        <button class="btn-primary" onclick="initGame()" style="width: auto; background: var(--text-muted);"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                        <p id="gameFeedback" style="margin-top: 15px; font-weight: 600;"></p>
+                    </div>
+                </section>
+
+                <section id="practice" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-pen-to-square"></i> <h3 class="card-title">Latihan Interaktif (10 Soal)</h3></div>
+                        <div id="practiceQuizContainer">
+                            <h4 id="practiceQuestion">Pertanyaan akan muncul di sini...</h4>
+                            <div class="options-grid" id="practiceOptions"></div>
+                            <div id="practiceExplanation" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 8px; display: none;"></div>
+                            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                                <button class="btn-primary" id="btnPrevPractice" onclick="prevPracticeQuestion()" style="width: auto;">Sebelumnya</button>
+                                <button class="btn-primary" id="btnNextPractice" onclick="nextPracticeQuestion()" style="width: auto;">Berikutnya</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="evaluation" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-clipboard-check"></i> <h3 class="card-title">Evaluasi Hasil Belajar</h3></div>
+                        <div id="evalStartScreen">
+                            <p>Evaluasi ini berisi 10 soal dengan alokasi waktu 5 menit. Klik tombol di bawah untuk memulai!</p>
+                            <br>
+                            <button class="btn-primary" onclick="startEvaluation()" style="width: auto;"><i class="fa-solid fa-play"></i> Mulai Ujian Evaluasi</button>
+                        </div>
+                        <div id="evalQuizScreen" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 id="evalTimer" style="color: #ef4444;"><i class="fa-solid fa-clock"></i> Waktu Sisa: 05:00</h4>
+                                <span id="evalCounter">Soal 1 / 10</span>
+                            </div>
+                            <h4 id="evalQuestion">Pertanyaan Evaluasi...</h4>
+                            <div class="options-grid" id="evalOptions"></div>
+                        </div>
+                        <div id="evalResultScreen" style="display: none; text-align: center;">
+                            <h3>Hasil Ujian Evaluasi</h3>
+                            <h1 id="evalScoreDisplay" style="font-size: 4rem; color: var(--primary); margin: 20px 0;">0</h1>
+                            <p id="evalStatus" style="font-size: 1.2rem; font-weight: 600;"></p>
+                            <br>
+                            <button class="btn-primary" onclick="startEvaluation()" style="width: auto;"><i class="fa-solid fa-rotate-right"></i> Ulangi Evaluasi</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="summary" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-file-contract"></i> <h3 class="card-title">Ringkasan Utama</h3></div>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li><strong>Procedure Text Goal:</strong> Memberikan petunjuk terstruktur tentang cara melakukan atau membuat sesuatu.</li>
+                            <li><strong>Core Elements in Money Management:</strong> Track Income & Expenses $\rightarrow$ Create Budget Categories $\rightarrow$ Save/Invest First $\rightarrow$ Evaluate Expenses Regularly.</li>
+                            <li><strong>Key Language:</strong> Imperative verbs (<em>Save, Budget, Calculate, Track</em>) and Action Verbs.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="references" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-link"></i> <h3 class="card-title">Referensi Pembelajaran</h3></div>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li>Kurikulum Merdeka - Bahasa Inggris Tingkat Lanjut Kelas XI (Kemendikbudristek).</li>
+                            <li>Financial Literacy Guidelines for High School Students.</li>
+                            <li>Font Awesome Icons & Google Fonts.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="profile" class="page-section">
+                    <div class="card glass">
+                        <div class="card-header"><i class="fa-solid fa-id-card"></i> <h3 class="card-title">Profil Penyusun</h3></div>
+                        <table style="width: 100%; border-collapse: collapse; line-height: 2.2;">
+                            <tr><td style="width: 180px; font-weight: 600;">Nama Penyusun</td><td>: INDAH NURYANI, S.Pd</td></tr>
+                            <tr><td style="font-weight: 600;">Instansi</td><td>: SMAN 1 Yosowilangun</td></tr>
+                            <tr><td style="font-weight: 600;">Mata Pelajaran</td><td>: Bahasa Inggris</td></tr>
+                            <tr><td style="font-weight: 600;">Kelas/Semester</td><td>: XI / Ganjil</td></tr>
+                            <tr><td style="font-weight: 600;">Kontak WA</td><td>: 082232232585</td></tr>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <button id="scrollTopBtn"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <script>
+        /* ===================================================
+           1. KONFIGURASI KUNCI PIN & VARIABEL GLOBAL
+           =================================================== */
+        // BATAS EDIT: Ubah PIN Akses di bawah ini sesuai keinginan Anda!
+        const SECRET_PIN = "123456";
+
+        // Local Storage State Management
+        let appState = {
+            studentName: localStorage.getItem('studentName') || '',
+            schoolName: localStorage.getItem('schoolName') || '',
+            theme: localStorage.getItem('theme') || 'light',
+            lastPage: localStorage.getItem('lastPage') || 'home',
+            practiceScore: 0,
+            evalScore: 0
+        };
+
+        // Bank Soal Latihan & Evaluasi (10 Soal Berbasis HOTS & Procedure Text Money Management)
+        const quizData = [
+            {
+                q: "What is the main purpose of a procedure text about personal money management?",
+                options: ["To entertain the reader with financial stories", "To guide readers step-by-step on how to manage personal finances", "To describe a bank building", "To persuade readers to buy expensive items"],
+                answer: 1,
+                explanation: "The purpose of a procedure text is to provide steps/instructions on how to achieve a goal, in this case, managing money."
+            },
+            {
+                q: "Which of the following is an imperative sentence used in financial planning?",
+                options: ["You should probably think about money.", "Calculate your total monthly income accurately.", "Money is very important.", "I spent my money yesterday."],
+                answer: 1,
+                explanation: "'Calculate your total monthly income accurately' is an imperative command starting with an action verb."
+            },
+            {
+                q: "What is the first step when creating a personal monthly budget?",
+                options: ["Spend money on entertainment", "Track and record your total income sources", "Borrow money from friends", "Buy brand new clothes"],
+                answer: 1,
+                explanation: "Knowing your total available income is the fundamental first step before dividing expenses."
+            },
+            {
+                q: "In a procedure text, words like 'First', 'Next', 'Then', and 'Finally' are called...",
+                options: ["Action verbs", "Temporal connectives / Sequence adverbs", "Descriptive adjectives", "Nouns"],
+                answer: 1,
+                explanation: "Temporal connectives signal the order of instructions."
+            },
+            {
+                q: "Why is 'Save money before spending' recommended in financial procedure texts?",
+                options: ["To ensure savings are prioritized over non-essential expenses", "To leave no money for food", "To waste money", "To make banking complicated"],
+                answer: 0,
+                explanation: "Prioritizing savings ensures financial stability before impulse purchases occur."
+            },
+            {
+                q: "'Track your daily expenses.' What does the underlined action verb 'Track' mean?",
+                options: ["Run fast", "Monitor and record continuously", "Ignore completely", "Forget"],
+                answer: 1,
+                explanation: "'Track' means keeping a detailed record of where money goes."
+            },
+            {
+                q: "Which generic structure usually contains the goal of the procedure text?",
+                options: ["Steps", "Goal / Aim (Title)", "Materials", "Conclusion"],
+                answer: 1,
+                explanation: "The Goal/Aim section states what is to be accomplished."
+            },
+            {
+                q: "If you have excess emergency savings, what should be the next logical step?",
+                options: ["Invest or keep it in a secure growth account", "Spend it all immediately", "Throw it away", "Stop working"],
+                answer: 0,
+                explanation: "Allocating excess funds into investments allows personal capital growth."
+            },
+            {
+                q: "Which structure is NOT typically part of a procedure text?",
+                options: ["Goal", "Steps", "Complication & Resolution", "Materials"],
+                answer: 2,
+                explanation: "'Complication & Resolution' belongs to Narrative Texts, not Procedure Texts."
+            },
+            {
+                q: "What tense is predominantly used in writing procedure texts?",
+                options: ["Past Continuous Tense", "Simple Present Tense", "Future Perfect Tense", "Past Simple Tense"],
+                answer: 1,
+                explanation: "Procedure texts use Simple Present Tense, mainly in imperative forms."
+            }
+        ];
+
+        /* ===================================================
+           2. EVENT LISTENERS & INITIALIZATION
+           =================================================== */
+        document.addEventListener("DOMContentLoaded", () => {
+            // Apply saved theme
+            if (appState.theme === 'dark') document.body.classList.add('dark-mode');
+            
+            // Check if already logged in
+            if (appState.studentName) {
+                showApp();
+            }
+
+            // Bind Form Login
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Bind Nav Links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    playSound('click');
+                    navigateTo(link.getAttribute('data-target'));
+                });
+            });
+
+            // Bind Dark Mode Toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            // Bind Sidebar Toggle
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            // Bind Scroll to Top
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            const mainContent = document.querySelector('main');
+            mainContent.addEventListener('scroll', () => {
+                if (mainContent.scrollTop > 200) scrollBtn.style.display = 'flex';
+                else scrollBtn.style.display = 'none';
+            });
+            scrollBtn.addEventListener('click', () => {
+                mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Load Game & Practice Quiz
+            initGame();
+            loadPracticeQuestion(0);
+        });
+
+        /* Audio Helper Function */
+        function playSound(type) {
+            try {
+                const snd = document.getElementById(`snd-${type}`);
+                if(snd) { snd.currentTime = 0; snd.play(); }
+            } catch(e) { console.log('Audio playback prevented by browser policy'); }
+        }
+
+        /* Login Handler */
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputName = document.getElementById('studentName').value.trim();
+            const inputSchool = document.getElementById('schoolName').value.trim();
+            const inputPin = document.getElementById('accessPin').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            if (inputPin === SECRET_PIN) {
+                appState.studentName = inputName;
+                appState.schoolName = inputSchool;
+                localStorage.setItem('studentName', inputName);
+                localStorage.setItem('schoolName', inputSchool);
+                errorDiv.style.display = 'none';
+                playSound('correct');
+                showApp();
+            } else {
+                playSound('wrong');
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function showApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            document.getElementById('displayStudentName').innerText = appState.studentName;
+            document.getElementById('welcomeGreeting').innerText = `Selamat Datang, ${appState.studentName}!`;
+            navigateTo(appState.lastPage);
+        }
+
+        /* Navigation Router */
+        function navigateTo(targetId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+            const activeSection = document.getElementById(targetId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                appState.lastPage = targetId;
+                localStorage.setItem('lastPage', targetId);
+                
+                // Update Title & Sidebar active state
+                const currentLink = document.querySelector(`.sidebar-menu a[data-target="${targetId}"]`);
+                if (currentLink) {
+                    currentLink.classList.add('active');
+                    document.getElementById('pageTitle').innerText = currentLink.innerText.trim();
+                }
+            }
+            // Close mobile sidebar if open
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        /* Accordion Toggle */
+        function toggleAccordion(element) {
+            playSound('click');
+            const item = element.parentElement;
+            item.classList.toggle('active');
+        }
+
+        /* Theme Toggle */
+        function toggleTheme() {
+            playSound('click');
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        /* ===================================================
+           3. GAME EDUKASI: SUSUN URUTAN (SEQUENCE ORDER)
+           =================================================== */
+        const gameItems = [
+            { id: 1, text: "1. Record total monthly income." },
+            { id: 2, text: "2. Set aside 20% for emergency savings." },
+            { id: 3, text: "3. Pay essential bills (food, utilities)." },
+            { id: 4, text: "4. Allocate budget for discretionary spending." }
+        ];
+
+        function initGame() {
+            const dragSource = document.getElementById('dragSource');
+            const dropTarget = document.getElementById('dropTarget');
+            dragSource.innerHTML = '';
+            dropTarget.innerHTML = '';
+            document.getElementById('gameFeedback').innerText = '';
+            document.getElementById('gameProgress').style.width = '0%';
+
+            // Shuffle Game Items
+            const shuffled = [...gameItems].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'drag-item';
+                div.innerText = item.text;
+                div.setAttribute('data-id', item.id);
+                div.onclick = () => selectGameItem(div);
+                dragSource.appendChild(div);
+            });
+        }
+
+        function selectGameItem(element) {
+            playSound('click');
+            const dropTarget = document.getElementById('dropTarget');
+            dropTarget.appendChild(element);
+            const totalDropped = dropTarget.children.length;
+            document.getElementById('gameProgress').style.width = `${(totalDropped / gameItems.length) * 100}%`;
+        }
+
+        function checkGameOrder() {
+            const dropTarget = document.getElementById('dropTarget');
+            const children = Array.from(dropTarget.children);
+            
+            if (children.length < gameItems.length) {
+                document.getElementById('gameFeedback').style.color = '#ef4444';
+                document.getElementById('gameFeedback').innerText = 'Pindahkan semua item ke area urutan target terlebih dahulu!';
+                playSound('wrong');
+                return;
+            }
+
+            let isCorrect = true;
+            children.forEach((child, idx) => {
+                if (parseInt(child.getAttribute('data-id')) !== idx + 1) {
+                    isCorrect = false;
+                }
+            });
+
+            const feedback = document.getElementById('gameFeedback');
+            if (isCorrect) {
+                feedback.style.color = '#22c55e';
+                feedback.innerText = 'Luar Biasa! Urutan Anda benar 100%.';
+                playSound('correct');
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                feedback.style.color = '#ef4444';
+                feedback.innerText = 'Urutan masih belum tepat. Silakan klik Reset dan coba lagi!';
+                playSound('wrong');
+            }
+        }
+
+        /* ===================================================
+           4. LATIHAN INTERAKTIF (PRACTICE QUIZ)
+           =================================================== */
+        let currentPracticeIdx = 0;
+
+        function loadPracticeQuestion(index) {
+            const qData = quizData[index];
+            document.getElementById('practiceQuestion').innerText = `${index + 1}. ${qData.q}`;
+            const optionsContainer = document.getElementById('practiceOptions');
+            const expContainer = document.getElementById('practiceExplanation');
+            optionsContainer.innerHTML = '';
+            expContainer.style.display = 'none';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => answerPractice(idx, qData.answer, btn, qData.explanation);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function answerPractice(selected, correct, btn, explanation) {
+            const allBtns = document.querySelectorAll('#practiceOptions .option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const expContainer = document.getElementById('practiceExplanation');
+            expContainer.style.display = 'block';
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                expContainer.innerHTML = `<strong style="color: #15803d;">Benar!</strong> ${explanation}`;
+                playSound('correct');
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct');
+                expContainer.innerHTML = `<strong style="color: #b91c1c;">Salah!</strong> ${explanation}`;
+                playSound('wrong');
+            }
+        }
+
+        function nextPracticeQuestion() {
+            playSound('click');
+            if (currentPracticeIdx < quizData.length - 1) {
+                currentPracticeIdx++;
+                loadPracticeQuestion(currentPracticeIdx);
+            }
+        }
+
+        function prevPracticeQuestion() {
+            playSound('click');
+            if (currentPracticeIdx > 0) {
+                currentPracticeIdx--;
+                loadPracticeQuestion(currentPracticeIdx);
+            }
+        }
+
+        /* ===================================================
+           5. EVALUASI (EXAM WITH TIMER)
+           =================================================== */
+        let evalIndex = 0;
+        let evalScore = 0;
+        let evalTimerInterval = null;
+        let timeLeft = 300; // 5 menit
+
+        function startEvaluation() {
+            playSound('click');
+            document.getElementById('evalStartScreen').style.display = 'none';
+            document.getElementById('evalResultScreen').style.display = 'none';
+            document.getElementById('evalQuizScreen').style.display = 'block';
+            
+            evalIndex = 0;
+            evalScore = 0;
+            timeLeft = 300;
+            
+            clearInterval(evalTimerInterval);
+            evalTimerInterval = setInterval(updateTimer, 1000);
+            
+            loadEvalQuestion();
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('evalTimer').innerHTML = `<i class="fa-solid fa-clock"></i> Waktu Sisa: ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(evalTimerInterval);
+                finishEvaluation();
+            }
+            timeLeft--;
+        }
+
+        function loadEvalQuestion() {
+            document.getElementById('evalCounter').innerText = `Soal ${evalIndex + 1} / ${quizData.length}`;
+            const qData = quizData[evalIndex];
+            document.getElementById('evalQuestion').innerText = `${evalIndex + 1}. ${qData.q}`;
+            
+            const optionsContainer = document.getElementById('evalOptions');
+            optionsContainer.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectEvalAnswer(idx, qData.answer);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectEvalAnswer(selected, correct) {
+            if (selected === correct) {
+                evalScore += 10;
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+
+            if (evalIndex < quizData.length - 1) {
+                evalIndex++;
+                loadEvalQuestion();
+            } else {
+                clearInterval(evalTimerInterval);
+                finishEvaluation();
+            }
+        }
+
+        function finishEvaluation() {
+            document.getElementById('evalQuizScreen').style.display = 'none';
+            document.getElementById('evalResultScreen').style.display = 'block';
+            
+            const finalScore = evalScore;
+            document.getElementById('evalScoreDisplay').innerText = finalScore;
+            
+            const statusText = document.getElementById('evalStatus');
+            if (finalScore >= 70) {
+                statusText.innerText = "Selamat, Anda LULUS Evaluasi!";
+                statusText.style.color = "#22c55e";
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+            } else {
+                statusText.innerText = "Mohon maaf, Anda BELUM LULUS. Silakan pelajari kembali materi dan pelajari latihan.";
+                statusText.style.color = "#ef4444";
+            }
+        }
+    </script>
+</body>
+</html>
